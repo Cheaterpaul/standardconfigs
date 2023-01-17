@@ -16,7 +16,7 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 
 group = 'de.cheaterpaul'
-version = '1.16.5-1.0.0'
+version = '1.16.5-1.1.0'
 
 java {
     archivesBaseName = 'modpackconfig'
