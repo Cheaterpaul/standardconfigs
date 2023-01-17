@@ -5,6 +5,7 @@ import com.google.common.io.Files;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,9 +13,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class CopyConfig {
@@ -42,19 +41,36 @@ public class CopyConfig {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private static void copyConfig(File file, ConfigType type) throws IOException {
+    private static boolean copyConfig(File file, ConfigType type) throws IOException {
         File to = new File(type.getTargetFolder(), file.getName());
-        if (to.exists())return;
+        if (to.exists()) return false;
         Files.copy(file, to);
+        return true;
     }
 
     private static void copyConfig(ConfigType type) {
-        getConfigFiles(type).forEach(file -> {
+        LOGGER.info("Copying config files for {}", type);
+        Collection<File> configFiles = getConfigFiles(type);
+        int copied = 0;
+        int skipped = 0;
+        List<Pair<File, Exception>> errors = new ArrayList<>();
+        for (File configFile : configFiles) {
             try {
-                copyConfig(file, type);
+                if(copyConfig(configFile, type)) {
+                    copied++;
+                    LOGGER.info("Copied config file {}", configFile.getName());
+                } else {
+                    skipped++;
+                    LOGGER.info("Skipped config file {}", configFile.getName());
+                }
             } catch (IOException e) {
-                LOGGER.error("Could not copy '" + file.getPath() + "' config preset to "+ type.getTargetFolder().getPath(), e);
+                LOGGER.error("Error copying config file {}", configFile, e);
+                errors.add(Pair.of(configFile, e));
             }
+        }
+        LOGGER.info("Finished copying: {} copied, {} skipped, {} errors", copied, skipped, errors.size());
+        errors.forEach(pair -> {
+            LOGGER.error("Error copying config file {}", pair.getLeft(), pair.getRight());
         });
     }
 
