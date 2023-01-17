@@ -1,5 +1,6 @@
 package de.cheaterpaul.modpackconfig;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -37,7 +38,7 @@ public class CopyConfig {
         File folder = new File(getPresetConfigPath().toFile(), type.getChildPath());
         if (!folder.exists()) return Collections.emptyList();
         File[] files = folder.listFiles();
-        return files != null ? List.of(files) : Collections.emptyList();
+        return files != null ? Lists.newArrayList(files) : Collections.emptyList();
     }
 
     @SuppressWarnings("UnstableApiUsage")
