@@ -1,9 +1,9 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "de.cheaterpaul.modpackconfig.mixin",
+  "package": "de.cheaterpaul.standardconfigs.mixin",
   "compatibilityLevel": "JAVA_8",
-  "refmap": "modpackconfig.refmap.json",
+  "refmap": "standardconfigs.refmap.json",
   "mixins": [
   ],
   "client": [

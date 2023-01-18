@@ -1,4 +1,4 @@
-package de.cheaterpaul.modpackconfig;
+package de.cheaterpaul.standardconfigs;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -6,14 +6,13 @@ import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
 
-@Mod(ModpackConfigMod.MODID)
-public class ModpackConfigMod {
+@Mod(StandardConfigsMod.MODID)
+public class StandardConfigsMod {
 
-    public static final String MODID = "modpackconfig";
+    public static final String MODID = "standardconfigs";
 
-    public ModpackConfigMod() {
+    public StandardConfigsMod() {
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> "", (incoming, isNetwork) -> true));
         copyConfigs();
     }

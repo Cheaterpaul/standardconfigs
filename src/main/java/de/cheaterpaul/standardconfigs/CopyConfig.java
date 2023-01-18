@@ -1,4 +1,4 @@
-package de.cheaterpaul.modpackconfig;
+package de.cheaterpaul.standardconfigs;
 
 import com.google.common.io.Files;
 import net.minecraftforge.fml.loading.FMLConfig;
@@ -19,8 +19,8 @@ import java.util.stream.Stream;
 
 public class CopyConfig {
 
-    private static final String path = "modpackconfig";
-    private static final Logger LOGGER = LogManager.getLogger("ModpackConfig");
+    private static final String path = "standardconfigs";
+    private static final Logger LOGGER = LogManager.getLogger("StandardConfigs");
 
     private static Path getPresetConfigPath() {
         return FMLPaths.GAMEDIR.get().resolve(path);
