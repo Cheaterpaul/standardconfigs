@@ -34,11 +34,11 @@ public class CopyConfig {
         return FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath());
     }
 
-    private static Collection<File> getConfigFiles(ConfigType type) {
+    private static List<Pair<File, String>> getConfigFiles(ConfigType type) {
         File folder = new File(getPresetConfigPath().toFile(), type.getChildPath());
         if (!folder.exists()) return Collections.emptyList();
         try (Stream<Path> files = java.nio.file.Files.find(folder.toPath(), Integer.MAX_VALUE, ((path1, basicFileAttributes) -> basicFileAttributes.isRegularFile()))) {
-            return files.map(Path::toFile).collect(Collectors.toList());
+            return files.map(Path::toFile).map(file -> Pair.of(file, trimStart(file.getAbsolutePath(), folder.getAbsolutePath()))).collect(Collectors.toList());
         } catch (Exception e) {
             LOGGER.error(type.getMarker(),"Could not copy files", e);
             return Collections.emptyList();
@@ -46,30 +46,31 @@ public class CopyConfig {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private static boolean copyConfig(File file, ConfigType type) throws IOException {
-        File to = new File(type.getTargetFolder(), file.getName());
+    private static boolean copyConfig(Pair<File, String> file, ConfigType type) throws IOException {
+        File to = new File(type.getTargetFolder(), file.getValue());
         if (to.exists()) return false;
-        Files.copy(file, to);
+        Files.createParentDirs(to);
+        Files.copy(file.getKey(), to);
         return true;
     }
 
     private static void copyConfig(ConfigType type) {
         LOGGER.info(type.getMarker(), "Copying config files");
-        Collection<File> configFiles = getConfigFiles(type);
+        Collection<Pair<File, String>> configFiles = getConfigFiles(type);
         int copied = 0;
         int skipped = 0;
         List<Pair<File, Exception>> errors = new ArrayList<>();
-        for (File configFile : configFiles) {
+        for (Pair<File, String> configFile : configFiles) {
             try {
                 if (copyConfig(configFile, type)) {
                     copied++;
-                    LOGGER.debug(type.getMarker(), "Copied config file {}", configFile.getName());
+                    LOGGER.debug(type.getMarker(), "Copied config file {}", configFile.getKey().getName());
                 } else {
                     skipped++;
-                    LOGGER.debug(type.getMarker(),"Skipped config file {}", configFile.getName());
+                    LOGGER.debug(type.getMarker(),"Skipped config file {}", configFile.getKey().getName());
                 }
             } catch (IOException e) {
-                errors.add(Pair.of(configFile, e));
+                errors.add(Pair.of(configFile.getLeft(), e));
             }
         }
         LOGGER.info(type.getMarker(),"Finished copying: {} copied, {} skipped, {} errors", copied, skipped, errors.size());
@@ -113,6 +114,10 @@ public class CopyConfig {
         public Marker getMarker() {
             return marker;
         }
+    }
+
+    private static String trimStart(String source, String trim) {
+        return source.replace(trim, "");
     }
 
 }
